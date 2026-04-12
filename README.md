@@ -1,10 +1,11 @@
-# 💳 Payflex
+# Payflex
 
-Application de paiement mobile et web — FastAPI + PostgreSQL + Expo + Next.js
+Application de paiement mobile et web. Elle permet à ses utilisateurs de générer des cartes bancaires virtuelles instantanément, sans avoir besoin d'une carte physique. Ces cartes virtuelles peuvent être utilisées pour effectuer des paiements en ligne sécurisés, recharger un solde, consulter l'historique des transactions et gérer son argent depuis n'importe quel appareil.
+
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 - [Prérequis](#-prérequis)
 - [Installation du projet](#-installation-du-projet)
@@ -14,7 +15,7 @@ Application de paiement mobile et web — FastAPI + PostgreSQL + Expo + Next.js
 
 ---
 
-## 🛠 Prérequis
+## Prérequis
 
 Avant de cloner le projet, chaque membre de l'équipe doit installer les outils suivants sur **Windows** :
 
