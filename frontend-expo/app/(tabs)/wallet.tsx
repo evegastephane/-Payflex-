@@ -1,4 +1,5 @@
 import { View, Text, Button, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 
 export default function Wallet() {
     return (
@@ -9,15 +10,11 @@ export default function Wallet() {
             <View style={styles.buttonContainer}>
                 <Button
                     title="Voir les transactions"
-                    onPress={() => alert('Redirection vers historique des transactions')}
+                    onPress={() => router.push('/transaction/history')}
                 />
                 <Button
                     title="Déposer des fonds"
-                    onPress={() => alert('Redirection vers dépôt')}
-                />
-                <Button
-                    title="Envoyer de l'argent"
-                    onPress={() => alert('Redirection vers envoi')}
+                    onPress={() => router.push('/deposit/amount')}
                 />
             </View>
         </View>
