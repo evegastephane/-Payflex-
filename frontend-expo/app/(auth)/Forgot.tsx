@@ -1,3 +1,4 @@
+// app/(auth)/forgot-password.tsx
 import React, { useState, useRef } from 'react';
 import {
   View,
@@ -12,6 +13,7 @@ import {
   Platform,
   Animated,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { Image } from 'react-native';
 import { Logo } from '@/constants/images';
@@ -19,13 +21,15 @@ import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
-const SignInScreen: React.FC = () => {
+const ForgotPasswordScreen: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [stayLoggedIn, setStayLoggedIn] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [emailFocused, setEmailFocused] = useState<boolean>(false);
   const [passwordFocused, setPasswordFocused] = useState<boolean>(false);
+  const [confirmPasswordFocused, setConfirmPasswordFocused] = useState<boolean>(false);
 
   const buttonScale = useRef(new Animated.Value(1)).current;
 
@@ -44,18 +48,39 @@ const SignInScreen: React.FC = () => {
     }).start();
   };
 
-  const handleLogin = (): void => {
-    console.log('Email:', email, 'Password:', password);
-  };
-
-  // Fonction pour rediriger vers la page Mot de passe oublié
-  const handleForgotPassword = (): void => {
-    router.push('/(auth)/Forgot');
-  };
-
-  // Fonction pour rediriger vers la page d'inscription
-  const handleSignUp = (): void => {
-    router.push('/(auth)/sign-up');
+  const handleResetPassword = (): void => {
+    if (!email) {
+      Alert.alert('Erreur', 'Veuillez entrer votre adresse e-mail');
+      return;
+    }
+    if (!password) {
+      Alert.alert('Erreur', 'Veuillez entrer votre nouveau mot de passe');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+    
+    console.log('Email:', email, 'Nouveau mot de passe:', password);
+    
+    // Afficher un message de succès et rediriger vers la connexion
+    Alert.alert(
+      'Succès !',
+      'Votre mot de passe a été réinitialisé avec succès.',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace('/(auth)/sign-in');
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -77,9 +102,9 @@ const SignInScreen: React.FC = () => {
             <Image source={Logo} style={styles.logoImage} />
           </View>
 
-          {/* ── Titre + Sous-titre ── */}
-          <Text style={styles.brandName}>Connectez-vous à votre compte</Text>
-          <Text style={styles.tagline}>Bienvenue, veuillez entrer vos informations.</Text>
+          {/* ── Titre ── */}
+          <Text style={styles.brandName}>Réinitialisation</Text>
+          <Text style={styles.tagline}>Entrez votre adresse e-mail et votre nouveau mot de passe</Text>
 
           {/* ── Carte blanche formulaire ── */}
           <View style={styles.card}>
@@ -104,14 +129,9 @@ const SignInScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Champ Password avec lien Mot de passe oublié */}
+            {/* Champ Nouveau Mot de passe */}
             <View style={styles.fieldGroup}>
-              <View style={styles.passwordLabelRow}>
-                <Text style={styles.fieldLabel}>Mot de passe</Text>
-                <TouchableOpacity activeOpacity={0.7} onPress={handleForgotPassword}>
-                  <Text style={styles.forgotText}>Mot de passe oublié?</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.fieldLabel}>Nouveau mot de passe</Text>
               <View style={[styles.inputWrapper, passwordFocused && styles.inputWrapperFocused]}>
                 <Text style={[styles.inputIcon, passwordFocused && styles.inputIconFocused]}>🔒</Text>
                 <TextInput
@@ -136,41 +156,45 @@ const SignInScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Stay logged in */}
-            <TouchableOpacity
-              style={styles.stayLoggedRow}
-              onPress={() => setStayLoggedIn(prev => !prev)}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.checkbox, stayLoggedIn && styles.checkboxActive]}>
-                {stayLoggedIn && <Text style={styles.checkmark}>✓</Text>}
+            {/* Champ Confirmation du mot de passe */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>Confirmer le mot de passe</Text>
+              <View style={[styles.inputWrapper, confirmPasswordFocused && styles.inputWrapperFocused]}>
+                <Text style={[styles.inputIcon, confirmPasswordFocused && styles.inputIconFocused]}>🔒</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="••••••••"
+                  placeholderTextColor="#B0B8CC"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showConfirmPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  onFocus={() => setConfirmPasswordFocused(true)}
+                  onBlur={() => setConfirmPasswordFocused(false)}
+                />
+                <TouchableOpacity
+                  onPress={() => setShowConfirmPassword(prev => !prev)}
+                  activeOpacity={0.6}
+                  style={styles.eyeButton}
+                >
+                  <Text style={styles.eyeIcon}>{showConfirmPassword ? '🙈' : '👁'}</Text>
+                </TouchableOpacity>
               </View>
-              <Text style={styles.stayLoggedText}>Se souvenir de moi</Text>
-            </TouchableOpacity>
+            </View>
 
-            {/* Bouton Se Connecter */}
+            {/* Bouton Réinitialiser */}
             <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
               <TouchableOpacity
-                style={styles.loginButton}
-                onPress={handleLogin}
+                style={styles.resetButton}
+                onPress={handleResetPassword}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 activeOpacity={1}
               >
-                <Text style={styles.loginButtonText}>Se Connecter</Text>
+                <Text style={styles.resetButtonText}>Réinitialiser</Text>
               </TouchableOpacity>
             </Animated.View>
-
-            {/* Séparateur */}
-            <View style={styles.separator} />
-
-            {/* Lien S'inscrire */}
-            <View style={styles.signupRow}>
-              <Text style={styles.signupText}>Vous n'avez pas de compte ? </Text>
-              <TouchableOpacity activeOpacity={0.7} onPress={handleSignUp}>
-                <Text style={styles.signupLink}>S'inscrire</Text>
-              </TouchableOpacity>
-            </View>
 
           </View>
 
@@ -180,11 +204,20 @@ const SignInScreen: React.FC = () => {
   );
 };
 
-export default SignInScreen;
+export default ForgotPasswordScreen;
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  safeArea: { flex: 1, backgroundColor: '#E8EBF5' },
+  flex: {
+    flex: 1,
+  },
+
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#E8EBF5',
+  },
+
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
@@ -192,6 +225,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 32,
   },
+
   logoCircle: {
     width: 80,
     height: 80,
@@ -206,22 +240,27 @@ const styles = StyleSheet.create({
     elevation: 4,
     marginBottom: 24,
   },
-  logoImage: { width: 50, height: 50, resizeMode: 'contain' },
+  logoImage: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
+  },
+
   brandName: {
     fontSize: 28,
     fontWeight: '800',
     color: '#1A1D2E',
     textAlign: 'center',
     letterSpacing: -0.5,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   tagline: {
     fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: 32,
-    letterSpacing: 0.1,
   },
+
   card: {
     width: '100%',
     backgroundColor: '#FFFFFF',
@@ -233,24 +272,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 24,
     elevation: 8,
-    marginBottom: 28,
+    marginBottom: 20,
   },
-  fieldGroup: { marginBottom: 20 },
+
+  fieldGroup: {
+    marginBottom: 20,
+  },
   fieldLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#9CA3AF',
-    letterSpacing: 1.2,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  passwordLabelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A1D2E',
     marginBottom: 8,
   },
-  forgotText: { fontSize: 10, fontWeight: '700', color: '#2B4EFF', letterSpacing: 1.2 },
+
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -262,35 +296,41 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   inputWrapperFocused: {
-    borderColor: '#2B4EFF',
+    borderColor: '#0D68F8',
     backgroundColor: '#FFFFFF',
-    shadowColor: '#2B4EFF',
+    shadowColor: '#0D68F8',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.10,
     shadowRadius: 8,
     elevation: 2,
   },
-  inputIcon: { fontSize: 16, color: '#9CA3AF', marginRight: 10, width: 20, textAlign: 'center' },
-  inputIconFocused: { color: '#2B4EFF' },
-  textInput: { flex: 1, fontSize: 15, color: '#1A1D2E', height: '100%', paddingVertical: 0 },
-  eyeButton: { padding: 4, marginLeft: 8 },
-  eyeIcon: { fontSize: 16, color: '#9CA3AF' },
-  stayLoggedRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 24 },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F3F4F8',
-    justifyContent: 'center',
-    alignItems: 'center',
+  inputIcon: {
+    fontSize: 16,
+    color: '#9CA3AF',
     marginRight: 10,
+    width: 20,
+    textAlign: 'center',
   },
-  checkboxActive: { backgroundColor: '#2B4EFF', borderColor: '#2B4EFF' },
-  checkmark: { fontSize: 11, color: '#FFFFFF', fontWeight: '700' },
-  stayLoggedText: { fontSize: 14, color: '#6B7280' },
-  loginButton: {
+  inputIconFocused: {
+    color: '#0D68F8',
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1A1D2E',
+    height: '100%',
+    paddingVertical: 0,
+  },
+  eyeButton: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  eyeIcon: {
+    fontSize: 16,
+    color: '#9CA3AF',
+  },
+
+  resetButton: {
     width: '100%',
     height: 56,
     backgroundColor: '#0D68F8',
@@ -302,16 +342,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.40,
     shadowRadius: 18,
     elevation: 10,
-    marginBottom: 24,
+    marginTop: 8,
   },
-  loginButtonText: { fontSize: 16, fontWeight: '700', color: '#FFFFFF', letterSpacing: 0.3 },
-  separator: { width: '100%', height: 1, backgroundColor: '#F0F1F5', marginBottom: 20 },
-  signupRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 0 },
-  signupText: { fontSize: 14, color: '#6B7280' },
-  signupLink: { fontSize: 14, color: '#2B4EFF', fontWeight: '700' },
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  footerItem: { flexDirection: 'row', alignItems: 'center' },
-  footerIcon: { fontSize: 12, marginRight: 5 },
-  footerText: { fontSize: 10, fontWeight: '600', color: '#9CA3AF', letterSpacing: 1.0 },
-  footerDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#9CA3AF', marginHorizontal: 12 },
+  resetButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
+  },
 });
