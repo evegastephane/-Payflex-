@@ -152,7 +152,7 @@ const SignInScreen: React.FC = () => {
             <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
               <TouchableOpacity
                 style={styles.loginButton}
-                onPress={handleLogin}
+                onPress={(handleLogin)=>router.push('(tabs)/wallet')}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 activeOpacity={1}
