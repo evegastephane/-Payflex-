@@ -5,6 +5,7 @@ export default function TabsLayout() {
     return (
         <Tabs
             screenOptions={{
+                headerShown: false,
                 tabBarActiveTintColor: '#4F46E5',
                 tabBarInactiveTintColor: '#9CA3AF',
                 tabBarStyle: { borderTopWidth: 1, borderTopColor: '#E5E7EB' },
@@ -14,6 +15,7 @@ export default function TabsLayout() {
                 name="wallet"
                 options={{
                     title: 'Portefeuille',
+                    headerShown: false,
                     tabBarIcon: ({ focused, color, size }) => (
                         <Ionicons name={focused ? 'wallet' : 'wallet-outline'} size={size} color={color} />
                     ),
@@ -23,6 +25,7 @@ export default function TabsLayout() {
                 name="card"
                 options={{
                     title: 'Carte',
+                    headerShown: false,
                     tabBarIcon: ({ focused, color, size }) => (
                         <Ionicons name={focused ? 'card' : 'card-outline'} size={size} color={color} />
                     ),
@@ -32,6 +35,9 @@ export default function TabsLayout() {
                 name="profile"
                 options={{
                     title: 'Profil',
+                    headerShown: false,
+                    // Hide bottom tab bar on profile pages (clean UX).
+                    tabBarStyle: { display: 'none' },
                     tabBarIcon: ({ focused, color, size }) => (
                         <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
                     ),
